@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "ServiceNow Groups" %} - {{ object.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>{% trans "ServiceNow Groups" %}</strong>
+                <div class="pull-right">
+                    <span class="badge">{{ servicenow_groups|length }}</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                {% if servicenow_groups %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-headings">
+                            <thead>
+                                <tr>
+                                    <th>{% trans "Name" %}</th>
+                                    <th>{% trans "Description" %}</th>
+                                    <th>{% trans "Assignment Method" %}</th>
+                                    <th>{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for group in servicenow_groups %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ group.get_absolute_url }}">{{ group.name }}</a>
+                                    </td>
+                                    <td>
+                                        {% if group.description %}
+                                            {{ group.description|truncatechars:50 }}
+                                        {% else %}
+                                            <span class="text-muted">{% trans "No description" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="label label-info">{{ group.assignment_summary }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-xs" role="group">
+                                            <a href="{{ group.get_absolute_url }}" class="btn btn-default btn-xs" title="{% trans 'View Details' %}">
+                                                <i class="mdi mdi-eye"></i>
+                                            </a>
+                                            {% if perms.service_now_groups.change_servicenowgroup %}
+                                            <a href="{% url 'admin:service_now_groups_servicenowgroup_change' group.pk %}" class="btn btn-default btn-xs" title="{% trans 'Edit' %}">
+                                                <i class="mdi mdi-pencil"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-muted text-center">
+                        <i class="mdi mdi-information-outline" style="font-size: 48px;"></i>
+                        <p>{% trans "No ServiceNow groups are associated with this device." %}</p>
+                        {% if perms.service_now_groups.add_servicenowgroup %}
+                        <a href="{% url 'admin:service_now_groups_servicenowgroup_add' %}" class="btn btn-primary">
+                            <i class="mdi mdi-plus"></i> {% trans "Create ServiceNow Group" %}
+                        </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if servicenow_groups %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>{% trans "Assignment Details" %}</strong>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    {% for group in servicenow_groups %}
+                    <div class="col-md-6">
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">{{ group.name }}</h4>
+                            </div>
+                            <div class="panel-body">
+                                {% if group.description %}
+                                    <p><strong>{% trans "Description" %}:</strong> {{ group.description }}</p>
+                                {% endif %}
+                                
+                                <p><strong>{% trans "Total Associated Devices" %}:</strong> {{ group.device_count }}</p>
+                                
+                                <div class="assignment-details">
+                                    <strong>{% trans "Assignment Methods" %}:</strong>
+                                    <ul class="list-unstyled">
+                                        {% if group.locations.exists %}
+                                            <li>
+                                                <i class="mdi mdi-map-marker text-success"></i>
+                                                <strong>{% trans "Locations" %}:</strong>
+                                                {% for location in group.locations.all %}
+                                                    <span class="label label-default">{{ location.name }}</span>
+                                                {% endfor %}
+                                            </li>
+                                        {% endif %}
+                                        
+                                        {% if group.dynamic_groups.exists %}
+                                            <li>
+                                                <i class="mdi mdi-group text-info"></i>
+                                                <strong>{% trans "Dynamic Groups" %}:</strong>
+                                                {% for dynamic_group in group.dynamic_groups.all %}
+                                                    <span class="label label-info">{{ dynamic_group.name }}</span>
+                                                {% endfor %}
+                                            </li>
+                                        {% endif %}
+                                        
+                                        {% if group.devices.exists %}
+                                            <li>
+                                                <i class="mdi mdi-server text-warning"></i>
+                                                <strong>{% trans "Explicit Devices" %}:</strong>
+                                                {% for device in group.devices.all %}
+                                                    <span class="label label-warning">{{ device.name }}</span>
+                                                {% endfor %}
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    // Add any JavaScript functionality here
+    console.log('ServiceNow Groups template loaded for device: {{ object.name }}');
+});
+</script>
+{% endblock %} 

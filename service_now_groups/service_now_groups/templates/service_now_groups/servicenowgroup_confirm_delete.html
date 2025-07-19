@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Delete ServiceNow Group{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <strong>Delete ServiceNow Group</strong>
+            </div>
+            <div class="panel-body">
+                <p>Are you sure you want to delete the ServiceNow group <strong>{{ object.name }}</strong>?</p>
+                
+                <div class="alert alert-warning">
+                    <h4><i class="mdi mdi-alert"></i> Warning</h4>
+                    <p>This action cannot be undone. The ServiceNow group will be permanently removed from the system.</p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="text-right">
+                        <a href="{% url 'plugins:service_now_groups:servicenowgroup_list' %}" class="btn btn-default">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Delete ServiceNow Group</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

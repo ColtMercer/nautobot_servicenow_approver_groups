@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "ServiceNow Groups" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>{% trans "ServiceNow Groups" %}</strong>
+                <div class="pull-right">
+                    {% if perms.service_now_groups.add_servicenowgroup %}
+                    <a href="{% url 'plugins:service_now_groups:servicenowgroup_add' %}" class="btn btn-primary btn-xs">
+                        <i class="mdi mdi-plus"></i> {% trans "Add ServiceNow Group" %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="panel-body">
+                {% include 'inc/table.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    // Initialize any JavaScript functionality here
+    console.log('ServiceNow Groups list page loaded');
+});
+</script>
+{% endblock %} 

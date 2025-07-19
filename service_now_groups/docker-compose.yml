@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: nautobot
+      POSTGRES_USER: nautobot
+      POSTGRES_PASSWORD: nautobot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nautobot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nautobot with ServiceNow Groups app
+  nautobot:
+    build: .
+    environment:
+      NAUTOBOT_DB_HOST: postgres
+      NAUTOBOT_DB_NAME: nautobot
+      NAUTOBOT_DB_USER: nautobot
+      NAUTOBOT_DB_PASSWORD: nautobot
+      NAUTOBOT_REDIS_HOST: redis
+      NAUTOBOT_REDIS_PORT: 6379
+      NAUTOBOT_SECRET_KEY: your-secret-key-here
+      NAUTOBOT_ALLOWED_HOSTS: localhost,127.0.0.1
+      NAUTOBOT_DEBUG: "true"
+      PLUGINS: service_now_groups
+      NAUTOBOT_ROOT: /app
+      NAUTOBOT_GIT_ROOT: /app/git
+      NAUTOBOT_STATIC_ROOT: /app/static
+      NAUTOBOT_MEDIA_ROOT: /app/media
+      NAUTOBOT_JOBS_ROOT: /app/jobs
+      NAUTOBOT_CONFIG_PATH: /app/nautobot_config.py
+    volumes:
+      - ./service_now_groups:/app/service_now_groups
+      - ./nautobot_config.py:/app/nautobot_config.py:ro
+      - ./media:/app/media
+      - ./static:/app/static
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "
+        nautobot-server migrate &&
+        nautobot-server collectstatic --noinput &&
+        nautobot-server runserver 0.0.0.0:8080
+      "
+
+  # Nautobot worker for background tasks
+  nautobot-worker:
+    build: .
+    environment:
+      NAUTOBOT_DB_HOST: postgres
+      NAUTOBOT_DB_NAME: nautobot
+      NAUTOBOT_DB_USER: nautobot
+      NAUTOBOT_DB_PASSWORD: nautobot
+      NAUTOBOT_REDIS_HOST: redis
+      NAUTOBOT_REDIS_PORT: 6379
+      NAUTOBOT_SECRET_KEY: your-secret-key-here
+      PLUGINS: service_now_groups
+    volumes:
+      - ./service_now_groups:/app/service_now_groups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: nautobot-server rqworker
+
+  # Nautobot scheduler
+  nautobot-scheduler:
+    build: .
+    environment:
+      NAUTOBOT_DB_HOST: postgres
+      NAUTOBOT_DB_NAME: nautobot
+      NAUTOBOT_DB_USER: nautobot
+      NAUTOBOT_DB_PASSWORD: nautobot
+      NAUTOBOT_REDIS_HOST: redis
+      NAUTOBOT_REDIS_PORT: 6379
+      NAUTOBOT_SECRET_KEY: your-secret-key-here
+      PLUGINS: service_now_groups
+    volumes:
+      - ./service_now_groups:/app/service_now_groups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: nautobot-server rqscheduler
+
+volumes:
+  postgres_data: 

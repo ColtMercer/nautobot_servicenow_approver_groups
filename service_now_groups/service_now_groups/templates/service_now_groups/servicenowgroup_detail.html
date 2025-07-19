@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load buttons %}
+{% load custom_links %}
+{% load helpers %}
+{% load plugins %}
+
+{% block title %}{{ servicenow_group.name }} - ServiceNow Group{% endblock %}
+
+{% block header %}
+    <div class="row noprint">
+        <div class="col-sm-8 col-md-9">
+            <ol class="breadcrumb">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'plugins:service_now_groups:servicenowgroup_list' %}">ServiceNow Groups</a></li>
+                <li>{{ servicenow_group.name }}</li>
+            </ol>
+        </div>
+        <div class="col-sm-4 col-md-3 noprint text-right">
+            {% plugin_buttons servicenow_group %}
+            {% if perms.service_now_groups.change_servicenowgroup %}
+                {% edit_button 'plugins:service_now_groups:servicenowgroup_edit' servicenow_group.pk %}
+            {% endif %}
+            {% if perms.service_now_groups.delete_servicenowgroup %}
+                {% delete_button 'plugins:service_now_groups:servicenowgroup_delete' servicenow_group.pk %}
+            {% endif %}
+        </div>
+    </div>
+    <h1>{% block page_title %}{{ servicenow_group.name }}{% endblock %}</h1>
+    <div class="text-muted">
+        {% block page_description %}
+            ServiceNow Group Details
+        {% endblock %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>ServiceNow Group Information</strong>
+                </div>
+                <table class="table table-hover panel-body">
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td>{{ servicenow_group.name }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td>{{ servicenow_group.description|default:"—" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Created</strong></td>
+                        <td>{{ servicenow_group.created|date:"M j, Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Last Updated</strong></td>
+                        <td>{{ servicenow_group.last_updated|date:"M j, Y H:i" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>Assignment Summary</strong>
+                </div>
+                <table class="table table-hover panel-body">
+                    <tr>
+                        <td><strong>Locations</strong></td>
+                        <td>
+                            {% if servicenow_group.locations.all %}
+                                {% for location in servicenow_group.locations.all %}
+                                    <a href="{% url 'dcim:location' pk=location.pk %}">{{ location.name }}</a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">None assigned</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dynamic Groups</strong></td>
+                        <td>
+                            {% if servicenow_group.dynamic_groups.all %}
+                                {% for dg in servicenow_group.dynamic_groups.all %}
+                                    <a href="{% url 'extras:dynamicgroup' pk=dg.pk %}">{{ dg.name }}</a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">None assigned</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Specific Devices</strong></td>
+                        <td>
+                            {% if servicenow_group.devices.all %}
+                                {% for device in servicenow_group.devices.all %}
+                                    <a href="{% url 'dcim:device' pk=device.pk %}">{{ device.name }}</a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">None assigned</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Associated Devices</strong></td>
+                        <td><span class="badge">{{ device_count }}</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if associated_devices %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <strong>Associated Devices ({{ device_count }})</strong>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-headings">
+                            <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Location</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Platform</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for device in associated_devices %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'dcim:device' pk=device.pk %}">{{ device.name }}</a>
+                                        </td>
+                                        <td>
+                                            {% if device.location %}
+                                                <a href="{% url 'dcim:location' pk=device.location.pk %}">{{ device.location.name }}</a>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if device.device_role %}
+                                                <a href="{% url 'dcim:devicerole' pk=device.device_role.pk %}">{{ device.device_role.name }}</a>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if device.status %}
+                                                <span class="label label-{{ device.status.color }}">{{ device.status.name }}</span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if device.platform %}
+                                                <a href="{% url 'dcim:platform' pk=device.platform.pk %}">{{ device.platform.name }}</a>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %} 

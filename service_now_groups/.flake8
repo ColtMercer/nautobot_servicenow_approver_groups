@@ -1,0 +1,26 @@
+[flake8]
+max-line-length = 120
+extend-ignore = 
+    E203,  # whitespace before ':'
+    W503,  # line break before binary operator
+    E501,  # line too long (handled by black)
+    F401,  # imported but unused (handled by isort)
+    F403,  # wildcard import (handled by isort)
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    .env,
+    build,
+    dist,
+    *.egg-info,
+    migrations,
+    .tox,
+    .pytest_cache,
+    .mypy_cache,
+    bandit-report.json
+per-file-ignores =
+    __init__.py:F401
+    tests/*:S101,S105,S106,S107 

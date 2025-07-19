@@ -1,0 +1,256 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nautobot-servicenow-groups"
+version = "0.0.0"
+description = "A Nautobot app that associates ServiceNow groups with Nautobot devices dynamically based on location, dynamic groups, or explicit device assignment."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Your Organization", email = "your-email@example.com"}
+]
+maintainers = [
+    {name = "Your Organization", email = "your-email@example.com"}
+]
+keywords = ["nautobot", "servicenow", "network-automation", "django"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Telecommunications Industry",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: System :: Networking",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "nautobot>=1.5.0",
+    "django>=3.2,<5.0",
+    "djangorestframework>=3.12.0",
+    "django-filter>=22.0",
+    "django-cors-headers>=3.10.0",
+    "django-redis>=5.0.0",
+    "psycopg2-binary>=2.9.0",
+    "redis>=4.0.0",
+    "requests>=2.25.0",
+    "factory-boy>=3.2.0",
+    "faker>=18.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-django>=4.5.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.8.0",
+    "pytest-xdist>=3.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "bandit>=1.7.0",
+    "pre-commit>=3.0.0",
+    "safety>=2.3.0",
+    "twine>=4.0.0",
+    "build>=0.10.0",
+    "setuptools>=65.0.0",
+    "wheel>=0.38.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-django>=4.5.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.8.0",
+    "pytest-xdist>=3.0.0",
+    "factory-boy>=3.2.0",
+    "faker>=18.0.0",
+]
+docs = [
+    "sphinx>=5.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+    "myst-parser>=0.18.0",
+    "sphinx-autodoc-typehints>=1.19.0",
+]
+docker = [
+    "docker>=6.0.0",
+    "docker-compose>=1.29.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/nautobot-servicenow-groups"
+Documentation = "https://docs.nautobot.com/projects/servicenow-groups/"
+Repository = "https://github.com/your-org/nautobot-servicenow-groups"
+"Bug Tracker" = "https://github.com/your-org/nautobot-servicenow-groups/issues"
+"Source Code" = "https://github.com/your-org/nautobot-servicenow-groups"
+"Release Notes" = "https://github.com/your-org/nautobot-servicenow-groups/releases"
+"Download" = "https://pypi.org/project/nautobot-servicenow-groups/"
+"Changelog" = "https://github.com/your-org/nautobot-servicenow-groups/blob/main/CHANGELOG.md"
+
+[project.scripts]
+nautobot-servicenow-groups = "service_now_groups.cli:main"
+
+[tool.setuptools]
+packages = ["service_now_groups"]
+
+[tool.setuptools.package-data]
+"service_now_groups" = [
+    "templates/**/*.html",
+    "static/**/*",
+    "migrations/*.py",
+    "migrations/*.sql",
+    "*.json",
+    "*.yaml",
+    "*.yml",
+]
+
+[tool.setuptools_scm]
+write_to = "service_now_groups/_version.py"
+version_scheme = "python-simplified-semver"
+local_scheme = "node-and-timestamp"
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["service_now_groups"]
+known_third_party = ["django", "nautobot", "rest_framework"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+    ".venv",
+    ".tox",
+    ".mypy_cache",
+]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "django.*",
+    "nautobot.*",
+    "rest_framework.*",
+    "factory_boy.*",
+    "faker.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=service_now_groups",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=90",
+]
+testpaths = ["tests", "service_now_groups/tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "api: marks tests as API tests",
+    "ui: marks tests as UI tests",
+    "models: marks tests as model tests",
+]
+
+[tool.coverage.run]
+source = ["service_now_groups"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__init__.py",
+    "*/_version.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "test_*", "*_test.py"]
+skips = ["B101", "B601"]
+
+[tool.safety]
+output = "json"
+full-report = true
+
+[tool.twine]
+repository = "https://upload.pypi.org/legacy/"
+username = "__token__"
+password = ""
+
+# Release configuration
+[tool.release]
+version_scheme = "python-simplified-semver"
+tag_format = "v{version}"
+commit_format = "Release {version}"
+branch = "main"
+remote = "origin" 

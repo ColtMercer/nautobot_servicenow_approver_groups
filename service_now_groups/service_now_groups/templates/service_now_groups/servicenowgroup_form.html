@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+    {% if object %}Edit{% else %}Add{% endif %} ServiceNow Group
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>{% if object %}Edit{% else %}Add{% endif %} ServiceNow Group</strong>
+            </div>
+            <div class="panel-body">
+                <form method="post" class="form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.name.id_for_label }}">Name *</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors }}</div>
+                                {% endif %}
+                                {% if form.name.help_text %}
+                                    <small class="form-text text-muted">{{ form.name.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="{{ form.description.id_for_label }}">Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="text-danger">{{ form.description.errors }}</div>
+                                {% endif %}
+                                {% if form.description.help_text %}
+                                    <small class="form-text text-muted">{{ form.description.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.locations.id_for_label }}">Locations</label>
+                                {{ form.locations }}
+                                {% if form.locations.errors %}
+                                    <div class="text-danger">{{ form.locations.errors }}</div>
+                                {% endif %}
+                                {% if form.locations.help_text %}
+                                    <small class="form-text text-muted">{{ form.locations.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.dynamic_groups.id_for_label }}">Dynamic Groups</label>
+                                {{ form.dynamic_groups }}
+                                {% if form.dynamic_groups.errors %}
+                                    <div class="text-danger">{{ form.dynamic_groups.errors }}</div>
+                                {% endif %}
+                                {% if form.dynamic_groups.help_text %}
+                                    <small class="form-text text-muted">{{ form.dynamic_groups.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.devices.id_for_label }}">Devices</label>
+                                {{ form.devices }}
+                                {% if form.devices.errors %}
+                                    <div class="text-danger">{{ form.devices.errors }}</div>
+                                {% endif %}
+                                {% if form.devices.help_text %}
+                                    <small class="form-text text-muted">{{ form.devices.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">
+                                {% if object %}Update{% else %}Create{% endif %} ServiceNow Group
+                            </button>
+                            <a href="{% url 'plugins:service_now_groups:servicenowgroup_list' %}" class="btn btn-default">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function() {
+    // Initialize form functionality
+    console.log('ServiceNow Group form loaded');
+});
+</script>
+{% endblock %} 
